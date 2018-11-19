@@ -1,7 +1,7 @@
 <template>
   <div>
     <button @click="play">开始</button>
-    <div id="play_area"></div>
+    <div id="play_area" :style="{width: areaWidth + 'px', height: areaHeight + 'px'}"></div>
   </div>
 </template>
 <script>
@@ -10,24 +10,25 @@ export default {
     return {
       playArea: null,
       cellArr: [],
-      cellRow: 3,
-      cellCol: 3,
+      cellRow: 4,
+      cellCol: 4,
       img: '',
       imgArr: [],  // 用于随机图片顺序
       cellWidth: 0,
       cellHeight: 0,
       cellIndex: 0,
       cellLeft: '',
-      cellTop: '',
-      nextIndex: 0,
-      ranArr: []
+      cellTop: '', 
+      ranArr: [],
+      areaWidth: 300,
+      areaHeight: 300
     }
   },
   methods: {
     init () {
       let dom
-      this.cellWidth = 300 / this.cellCol
-      this.cellHeight = 300 / this.cellRow
+      this.cellWidth = this.areaWidth / this.cellCol
+      this.cellHeight = this.areaHeight / this.cellRow
       for (let i = 0; i < this.cellRow; i++) {
         for (let j = 0; j < this.cellCol; j++) {
           this.imgArr.push(i * this.cellCol + j)
@@ -86,7 +87,6 @@ export default {
         }
       }
     },
-    /* eslint-disable */
     cellDown (e, _cell) {
       const _this = this
       const parentLeft = this.playArea.offsetLeft
@@ -104,17 +104,10 @@ export default {
       document.onmouseup = function (e) {
         document.onmousemove = null
         document.onmouseup = null
-        const left = Number(_cell.style.left.split('px')[0])
-        const top = Number(_cell.style.top.split('px')[0])
-        // if (left < 0 || left > 200 || top < 0 || top > 200) {
-        //   _this.returnCell(_cell)
-        //   return
-        // }
-        if(e.pageX - parentLeft < 0 || e.pageX - parentLeft > 300 || e.pageY - parentTop < 0 || e.pageY - parentTop > 300) {
+        if(e.pageX - parentLeft < 0 || e.pageX - parentLeft > _this.areaWidth || e.pageY - parentTop < 0 || e.pageY - parentTop > _this.areaHeight) {
           _this.returnCell(_cell)
           return
         }
-        console.log('可以进行位置更换')
         let _tx, _ty, _ti, _tj
         _tx = e.pageX - parentLeft
         _ty = e.pageY - parentTop
@@ -126,7 +119,6 @@ export default {
         if (_this.nextIndex === _this.cellIndex) {
           _this.returnCell(_cell)
         } else {
-          console.log(_this.nextIndex, _this.cellIndex)
           _this.changeCell()
         }
       }
@@ -143,8 +135,8 @@ export default {
       let _tl = this.cellLeft
       let _tt = this.cellTop
       let _nc = this.cellArr[this.nextIndex]
-      let _nl = (this.nextIndex % this.cellCol) * 100
-      let _nt = Math.floor(this.nextIndex / this.cellCol) * 100
+      let _nl = (this.nextIndex % this.cellCol) * this.cellWidth
+      let _nt = Math.floor(this.nextIndex / this.cellCol) * this.cellHeight
       _nc.style.zIndex = '98'
 
       this.ranArr[this.nextIndex] = this.ranArr[this.nextIndex] + this.ranArr[this.cellIndex]
@@ -170,12 +162,15 @@ export default {
         _tc.style.boxShadow = ''
         clearInterval(timer)
       })
+      if (this.ranArr.join() == this.imgArr.join()) {
+        alert('success')
+      }
       this.bindCell()
     }
   },
   mounted () {
     this.playArea = this.$el.querySelector('#play_area')
-    this.img = require('../assets/puzzleGame/test.jpg')
+    this.img = require('../assets/puzzleGame/puzzle.jpg')
     this.init()
   }
 };
@@ -183,8 +178,6 @@ export default {
 <style>
 #play_area {
   position: relative;
-  width: 300px;
-  height: 300px;
   margin: auto;
   background: #fefefe;
   border-radius: 2px;
