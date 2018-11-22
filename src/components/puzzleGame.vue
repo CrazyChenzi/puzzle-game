@@ -1,6 +1,10 @@
 <template>
   <div>
-    <button @click="play">开始</button>
+    <div>
+      <label>行：</label><input type="number" class="header-container" v-model="cellRow">
+      <label>列：</label><input type="number" class="header-container" v-model="cellCol">
+      <button @click="play" class="header-container">开始</button>
+    </div>
     <div id="play_area" :style="{width: areaWidth + 'px', height: areaHeight + 'px'}"></div>
   </div>
 </template>
@@ -9,22 +13,24 @@ export default {
   data() {
     return {
       playArea: null,
-      cellArr: [],
-      cellRow: 4,
-      cellCol: 4,
-      img: '',
+      cellArr: [],  // 保存html元素
+      cellRow: 3, // 行
+      cellCol: 3, // 列
+      img: '',  // 图片地址
       imgArr: [],  // 用于随机图片顺序
-      cellWidth: 0,
+      cellWidth: 0, // 每一个图的宽度
       cellHeight: 0,
-      cellIndex: 0,
-      cellLeft: '',
+      cellIndex: null, // 当前拖动元素的index
+      nextIndex: null,  // 元素的最终的index 用于交换位置
+      cellLeft: '', // 元素的left坐标值
       cellTop: '', 
-      ranArr: [],
-      areaWidth: 300,
-      areaHeight: 300
+      ranArr: [], // 用于存放元素的数组
+      areaWidth: 300, // play_area的宽度
+      areaHeight: 300 // play_area的高度
     }
   },
   methods: {
+    // 初始化方法
     init () {
       let dom
       this.cellWidth = this.areaWidth / this.cellCol
@@ -49,9 +55,16 @@ export default {
       this.playArea.append(...this.cellArr)
     },
     play () {
+      this.cellArr.forEach((child) => {
+        this.playArea.removeChild(child)
+      })
+      this.imgArr = []
+      this.cellArr = []
+      this.init()
       this.randomImg()
       this.bindCell()
     },
+    // 随机打乱元素顺序
     randomImg () {
       let arr, random
       arr = this.imgArr.slice()
@@ -65,6 +78,7 @@ export default {
         arr.splice(random, 1)
       }
     },
+    // 绑定拖动方法
     bindCell () {
       const _this = this
       for (let i = 0, len = this.cellArr.length; i < len; i++) {
@@ -87,6 +101,7 @@ export default {
         }
       }
     },
+    // 拖动
     cellDown (e, _cell) {
       const _this = this
       const parentLeft = this.playArea.offsetLeft
@@ -123,6 +138,7 @@ export default {
         }
       }
     },
+    // 不需更换位置时返回到原位置
     returnCell (_cell) {
       const timer = setInterval(() => {
         _cell.style.left = this.cellLeft + 'px'
@@ -130,6 +146,7 @@ export default {
         clearInterval(timer)
       })
     },
+    // 交换位置
     changeCell () {
       let _tc = this.cellArr[this.cellIndex]
       let _tl = this.cellLeft
@@ -162,9 +179,11 @@ export default {
         _tc.style.boxShadow = ''
         clearInterval(timer)
       })
+      // 判断是否拼图成功
       if (this.ranArr.join() == this.imgArr.join()) {
         alert('success')
       }
+      // 重置绑定的mouse方法
       this.bindCell()
     }
   },
@@ -176,6 +195,10 @@ export default {
 };
 </script>
 <style>
+.header-container {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
 #play_area {
   position: relative;
   margin: auto;
