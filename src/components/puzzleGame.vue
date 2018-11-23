@@ -148,35 +148,36 @@ export default {
     },
     // 交换位置
     changeCell () {
-      let _tc = this.cellArr[this.cellIndex]
-      let _tl = this.cellLeft
-      let _tt = this.cellTop
-      let _nc = this.cellArr[this.nextIndex]
-      let _nl = (this.nextIndex % this.cellCol) * this.cellWidth
-      let _nt = Math.floor(this.nextIndex / this.cellCol) * this.cellHeight
-      _nc.style.zIndex = '98'
+      let cellDom = this.cellArr[this.cellIndex]  // 之前的dom元素
+      let cellLeft = this.cellLeft
+      let cellTop = this.cellTop
+      let nextDom = this.cellArr[this.nextIndex]  // 要交换的dom元素
+      let nextLeft = (this.nextIndex % this.cellCol) * this.cellWidth
+      let nextTop = Math.floor(this.nextIndex / this.cellCol) * this.cellHeight
+      nextDom.style.zIndex = '98'
 
+      // 交换index值
       this.ranArr[this.nextIndex] = this.ranArr[this.nextIndex] + this.ranArr[this.cellIndex]
       this.ranArr[this.cellIndex] = this.ranArr[this.nextIndex] - this.ranArr[this.cellIndex]
       this.ranArr[this.nextIndex] = this.ranArr[this.nextIndex] - this.ranArr[this.cellIndex]
       
-      _tc.style.left = _nl + 'px'
-      _tc.style.top = _nt + 'px'
+      cellDom.style.left = nextLeft + 'px'
+      cellDom.style.top = nextTop + 'px'
 
-      _nc.style.left = _tl + 'px'
-      _nc.style.top = _tt + 'px'
-      this.cellArr[this.nextIndex] = _tc
-      this.cellArr[this.cellIndex] = _nc
+      nextDom.style.left = cellLeft + 'px'
+      nextDom.style.top = cellTop + 'px'
+      this.cellArr[this.nextIndex] = cellDom
+      this.cellArr[this.cellIndex] = nextDom
 
       const timer = setInterval(() => {
-        _nc.style.zIndex = ''
-        _nc.style.filter = ''
-        _nc.style.opacity = ''
-        _nc.style.boxShadow = ''
-        _tc.style.zIndex = ''
-        _tc.style.filter = ''
-        _tc.style.opacity = ''
-        _tc.style.boxShadow = ''
+        nextDom.style.zIndex = ''
+        nextDom.style.filter = ''
+        nextDom.style.opacity = ''
+        nextDom.style.boxShadow = ''
+        cellDom.style.zIndex = ''
+        cellDom.style.filter = ''
+        cellDom.style.opacity = ''
+        cellDom.style.boxShadow = ''
         clearInterval(timer)
       })
       // 判断是否拼图成功
